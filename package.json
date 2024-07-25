@@ -1,0 +1,16 @@
+{
+  "name": "chaiaurbackendproject",
+  "version": "1.0.0",
+  "description": "Making backend project with chai aur code (pase 1)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "javascript",
+    "backend",
+    "chai"
+  ],
+  "author": "Satyam kalihari",
+  "license": "ISC"
+}
