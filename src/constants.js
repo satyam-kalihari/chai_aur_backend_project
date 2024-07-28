@@ -1,0 +1,1 @@
+export const DB_NAME = "chai_aur_backend_project_1"
