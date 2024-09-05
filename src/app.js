@@ -11,6 +11,16 @@ app.use(cors({
 app.use(express.json({limit:"16kb"}))
 app.use(express.urlencoded({extended: true, limit:"16kb"}))
 app.use(express.static('public'))
-app.use(cookieParser)
+// app.use(cookieParser) iis ek cheez ki vajaha se 2 hafte se kaam ruka hua thaw
+app.use(cookieParser())
 
-export default app
+//import router
+import userRouter from "./routes/user.routes.js";
+
+//router detection
+app.use("/api/v1/users", userRouter)
+app.get("/", (req, res) => {
+  res.send("Welcome to the API");
+})
+
+export {app}
