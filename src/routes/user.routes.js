@@ -12,4 +12,4 @@ router.route("/register").post(
   registerUser
 );
 
-export default router;
+export default router;     
