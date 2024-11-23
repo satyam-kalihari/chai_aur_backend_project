@@ -1,10 +1,29 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
-import {ApiError} from "../utils/ApiError.js"
-import {User} from "../models/user.models.js"
+import { ApiError } from "../utils/ApiError.js";
+import { User } from "../models/user.models.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
+// import { use } from "express/lib/application.js";
+
+const generateAccessAndRefereshTokens = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    const accessToken = user.generateAccessToken();
+    const refereshToken = user.generateRefereshToken();
+
+    (user.refereshToken = refereshToken),
+      await user.save({ validateBeforeSave: false });
+
+    return { accessToken, refereshToken };
+
+  } catch (error) {
+    throw new ApiError(
+      500,
+      "Something went wrong while taking accesstoken and refresh token."
+    );
+  }
+};
 
 const registerUser = asyncHandler(async (req, res) => {
   // get user details from frontend
@@ -59,6 +78,7 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Avatar file is required");
   }
 
+  //create user object
   const user = await User.create({
     fullName,
     avatar: avatar.url,
@@ -81,4 +101,27 @@ const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, createdUser, "User registered Successfully"));
 });
 
-export { registerUser };
+const loginUser = asyncHandler(async (req, res) => {
+  const { username, password, email } = req.body;
+
+  if (!username || !email) {
+    throw new ApiError(400, "Username and Email are required");
+  }
+
+  const user = await User.findOne({ $or: [{ username }, { email }] });
+
+  if (!user) {
+    throw new ApiError(404, "User does not exist");
+  }
+
+  const isPasswordValid = await user.isPasswordCorrect(password);
+
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Invalid password");
+  }
+
+  const {accessToken, refereshToken} = await generateAccessAndRefereshTokens(user._id);
+   
+});
+
+export { registerUser, loginUser };
